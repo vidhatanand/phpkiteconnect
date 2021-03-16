@@ -1202,11 +1202,14 @@ class KiteConnect {
 	 */
 	private function _curl($url, $method, $headers, $params=null) {
 		$ch = curl_init();
+		$cert =  dirname(__FILE__)."/cacert.pem";
 
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_ENCODING , "gzip");
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $cert);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $cert);
 
 		if($headers && is_array($headers) && count($headers) > 0) {
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
