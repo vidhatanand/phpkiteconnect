@@ -52,22 +52,23 @@ if($openpos == null) {
         }
     } 
 } else {
-    if($openpos->opt == 'CALL' && $data == '::SHORT::') {
+    if(($openpos->opt == 'CALL' && $data == '::SHORT::') or ($openpos->opt == 'PUT' && $data == '::LONG::')) {
+        // bhago
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
         if($openslorder != null) {
-            if($ltpopt - $openslorder->parent_price > 8) {
+            $params["trigger_price"] = $ltpopt - 1; 
+            $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
+        } 
+    } elseif (($openpos->opt == 'CALL' && $data == '::LONG::') or ($openpos->opt == 'PUT' && $data == '::SHORT::')) {
+        // Trail
+        $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
+        if($openslorder != null) {
+            if($ltpopt - $openslorder->trigger_price > 10) {
                 $params["trigger_price"] = $ltpopt - 5; 
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
             }
-        }
-    } elseif ($openpos->opt == 'PUT' && $data == '::LONG::') {
-        $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
-        if($openslorder != null) {
-            if($ltpopt - $openslorder->parent_price > 8) {
-                $params["trigger_price"] = $ltpopt - 5; 
-                $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
-            }
-        }
+        } 
+
     }
 }
 
@@ -155,8 +156,8 @@ function buy($inst, $configs, $ltp) {
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
 		"quantity" => 100,
-        "price" => $ltp - 2,
-        "trigger_price" => $ltp - round($ltp/10),
+        "price" => $ltp,
+        "trigger_price" => $ltp - round($ltp/20),
 		"transaction_type" => "BUY",
 		"order_type" => "LIMIT",
 		"product" => "NRML"
