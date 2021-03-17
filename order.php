@@ -196,7 +196,7 @@ function build_nearest_atm($price, $opt) {
     $rprice = round($price);
     $pstrike = $rprice - ($rprice % 500);
     $cstrike = $rprice - ($rprice % 500) + 500;
-    $expiry = '21318';
+    $expiry = '21MAR';
 
     if ($opt == 'CALL') {
         return 'BANKNIFTY'.$expiry.$cstrike.'CE';
