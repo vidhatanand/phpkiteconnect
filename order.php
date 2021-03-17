@@ -42,9 +42,9 @@ function get_openposition($configs) {
 		if ($pos->quantity != 0) {
 			$openpos = $pos;
 			$opt = substr($pos->tradingsymbol, -2);
-			if ($opt == CE) {
+			if ($opt == 'CE') {
 				$openpos->opt = 'CALL';
-			} elseif ($opt == PE) {
+			} elseif ($opt == 'PE') {
 				$openpos->opt = 'PUT';			
 			}
 		
