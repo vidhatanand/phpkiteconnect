@@ -1,29 +1,102 @@
 <?php
 $data = file_get_contents("php://input");
-
 $currentTimeinSeconds = time(); 
 
-if ($data == '::LONG::') {
-    $configs[$currentTimeinSeconds] = '1';
-    error_log("111111");
+include dirname(__FILE__)."/kiteconnect.php";
+$configs_object = file_get_contents('./config.json');
+$configs = json_decode($configs_object, true);
 
-} elseif ($data == '::SHORT::') {
-    $configs[$currentTimeinSeconds] = '-1';
-    error_log("-----111111");
+$openpos = get_openposition($configs);
+
+if ($data == '::LONG::' && $openpos == null) {
+    $ltp = get_ltp($configs);
+    $inst = build_nearest_atm($ltp, 'CALL');
+    buy($inst);
+
+
+} elseif ($data == '::SHORT::' && $openpos == null) {
+    $ltp = get_ltp($configs);
+    $inst = build_nearest_atm($ltp, 'PUT');
+    buy($inst);
+}
+
+function get_openposition($configs) {
+    $kite = new KiteConnect($configs["api_key"]);
+    $kite->setAccessToken($configs["access_token"]);
+
+	$allpos = $kite->getPositions();
+	foreach ($allpos->net as $key => $pos) {
+		if ($pos->quantity != 0) {
+			$openpos = $pos;
+			$opt = substr($pos->tradingsymbol, -2);
+			if ($opt == CE) {
+				$openpos->opt = 'CALL';
+			} elseif ($opt == PE) {
+				$openpos->opt = 'PUT';			
+			}
+		
+		}
+	}
+    if(count($openpos) != 0) {
+        return $openpos;
+    } else {
+        return null;
+    }
 
 }
 
-$configs_object = json_encode($configs);
-file_put_contents('./log.json', $configs_object);
+function buy($inst) {
+    $kite = new KiteConnect($configs["api_key"]);
+	$kite->setAccessToken($configs["access_token"]);
 
-// include dirname(__FILE__)."/kiteconnect.php";
-// $configs_object = file_get_contents('./config.json');
-// $configs = json_decode($configs_object, true);
+	$order_id = $kite->placeOrder("regular", [
+		"tradingsymbol" => $inst,
+		"exchange" => "NFO",
+		"quantity" => 1000,
+		"transaction_type" => "BUY",
+		"order_type" => "MARKET",
+		"product" => "NRML"
+	])["order_id"];
 
-// $kite = new KiteConnect($configs["api_key"]);
-// $kite->setAccessToken($configs["access_token"]);
-// foreach ($events as $event) {
-//   // Here, you now have each event and can process them how you like
-//   process_event($event);
-// }
+    return $order_id;
+}
+
+function sell($inst) {
+	$kite = new KiteConnect($configs["api_key"]);
+	$kite->setAccessToken($configs["access_token"]);
+
+	$order_id = $kite->placeOrder("regular", [
+		"tradingsymbol" => "INFY",
+		"exchange" => "NSE",
+		"quantity" => 1,
+		"transaction_type" => "BUY",
+		"order_type" => "MARKET",
+		"product" => "NRML"
+	])["order_id"];
+}
+
+function get_ltp($configs) {
+    $kite = new KiteConnect($configs["api_key"]);
+    $kite->setAccessToken($configs["access_token"]);
+    $values = $kite->getLTP(["260105"]);
+
+    foreach ($values as $key => $value) {
+        $price = $value->last_price;
+    }
+    return $price;
+}
+
+function build_nearest_atm($price, $opt) {
+    $rprice = round($price);
+    $pstrike = $rprice - ($rprice % 500);
+    $cstrike = $rprice - ($rprice % 500) + 500;
+    $expiry = '21318';
+
+    if ($opt == 'CALL') {
+        return 'BANKNIFTY'.$expiry.$cstrike.'CE';
+    } elseif($opt == 'PUT') {
+        return 'BANKNIFTY'.$expiry.$pstrike.'PE';
+    }
+}
+
 ?>

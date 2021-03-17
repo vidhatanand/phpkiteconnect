@@ -8,11 +8,25 @@
 
 	// Get the list of positions.
 	echo "Positions: \n";
-	print_r($kite->getPositions());
+	$allpos = $kite->getPositions();
+	foreach ($allpos->net as $key => $pos) {
+		if ($pos->quantity != 0) {
+			$openpos = $pos;
+			$opt = substr($pos->tradingsymbol, -2);
+			if ($opt == CE) {
+				$openpos->opt = 'CALL';
+			} elseif ($opt == PE) {
+				$openpos->opt = 'PUT';			
+			}
+		
+		}
+	}
+	print_r($openpos);
+	die;
 
 	// Retrieve quote and market depth for list of instruments.
 	echo "Quote: \n";
-	print_r($kite->getQuote(["NSE:INFY", "NSE:SBIN"]));
+	print_r();
 
 	// Place order.
 	$order_id = $kite->placeOrder("regular", [
