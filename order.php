@@ -26,9 +26,9 @@ if($openpos == null) {
     } 
 } else {
     if($openpos->opt == 'CALL' && $data == '::SHORT::') {
-
+        sell($openpos->tradingsymbol, $configs, $openpos->quantity);
     } elseif ($openpos->opt == 'PUT' && $data == '::LONG::') {
-
+        sell($openpos->tradingsymbol, $configs, $openpos->quantity);
     }
 }
 
@@ -65,7 +65,7 @@ function buy($inst, $configs) {
 	$order_id = $kite->placeOrder("regular", [
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
-		"quantity" => 1000,
+		"quantity" => 100,
 		"transaction_type" => "BUY",
 		"order_type" => "MARKET",
 		"product" => "NRML"
@@ -74,15 +74,15 @@ function buy($inst, $configs) {
     return $order_id;
 }
 
-function sell($inst, $configs) {
+function sell($inst, $configs, $quantity) {
 	$kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
 
 	$order_id = $kite->placeOrder("regular", [
-		"tradingsymbol" => "INFY",
-		"exchange" => "NSE",
-		"quantity" => 1,
-		"transaction_type" => "BUY",
+		"tradingsymbol" => $inst,
+		"exchange" => "NFO",
+		"quantity" => $quantity,
+		"transaction_type" => "SELL",
 		"order_type" => "MARKET",
 		"product" => "NRML"
 	])["order_id"];
