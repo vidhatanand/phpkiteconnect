@@ -11,13 +11,13 @@ $openpos = get_openposition($configs);
 if ($data == '::LONG::' && $openpos == null) {
     $ltp = get_ltp($configs);
     $inst = build_nearest_atm($ltp, 'CALL');
-    buy($inst);
+    buy($inst, $configs);
 
 
 } elseif ($data == '::SHORT::' && $openpos == null) {
     $ltp = get_ltp($configs);
     $inst = build_nearest_atm($ltp, 'PUT');
-    buy($inst);
+    buy($inst, $configs);
 }
 
 function get_openposition($configs) {
@@ -45,7 +45,7 @@ function get_openposition($configs) {
 
 }
 
-function buy($inst) {
+function buy($inst, $configs) {
     $kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
 
@@ -61,7 +61,7 @@ function buy($inst) {
     return $order_id;
 }
 
-function sell($inst) {
+function sell($inst, $configs) {
 	$kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
 
