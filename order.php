@@ -156,7 +156,7 @@ function buy($inst, $configs, $ltp) {
 		"exchange" => "NFO",
 		"quantity" => 100,
         "price" => $ltp - 2,
-        "trigger_price" => round($ltp/100),
+        "trigger_price" => round($ltp/10),
 		"transaction_type" => "BUY",
 		"order_type" => "LIMIT",
 		"product" => "NRML"
