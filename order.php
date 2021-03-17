@@ -9,15 +9,19 @@ $configs = json_decode($configs_object, true);
 $openpos = get_openposition($configs);
 
 if($openpos == null) {
+
+    error_log('no order');
     if ($data == '::LONG::') {
         $ltp = get_ltp($configs);
         $inst = build_nearest_atm($ltp, 'CALL');
+        error_log('buy '. $inst);
         buy($inst, $configs);
     
     
     } elseif ($data == '::SHORT::') {
         $ltp = get_ltp($configs);
         $inst = build_nearest_atm($ltp, 'PUT');
+        error_log('buy '. $inst);
         buy($inst, $configs);
     } 
 } else {
