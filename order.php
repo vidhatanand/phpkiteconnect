@@ -8,6 +8,13 @@ $configs = json_decode($configs_object, true);
 
 $openpos = get_openposition($configs);
 
+$kite = new KiteConnect($configs["api_key"]);
+$kite->setAccessToken($configs["access_token"]);
+$allpos = $kite->getOrders();
+
+$openord = get_openorders($configs, $allpos);
+$openslorder = get_pendingslorders($configs, $allpos);
+
 if($openpos == null) {
     error_log('no order');
     if ($data == '::LONG::') {
@@ -15,25 +22,52 @@ if($openpos == null) {
         $inst = build_nearest_atm($ltp, 'CALL');
         $ltpopt = get_ltp($configs, "NFO:".$inst);
         error_log('buy '. $inst );
-        buy($inst, $configs, $ltpopt);
-        sl($inst, $configs, $ltpopt);
-        
-    
+        if($openord != null) {
+            $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
+            if($ltpopenord - $openord->tradingsymbol > 9 ) {
+                $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
+                if($cancel) {
+                    buy($inst, $configs, $ltpopt);
+                }   
+            }
+        } else {
+            buy($inst, $configs, $ltpopt);
+        }
+
     } elseif ($data == '::SHORT::') {
         $ltp = get_ltp($configs, "260105");
         $inst = build_nearest_atm($ltp, 'PUT');
         $ltpopt = get_ltp($configs, "NFO:".$inst);
         error_log('buy '. $inst, $ltpopt);
-        buy($inst, $configs, $ltpopt);
-        sl($inst, $configs, $ltpopt);
+        if($openord != null) {
+            $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
+            if($ltpopenord - $openord->tradingsymbol > 9 ) {
+                $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
+                if($cancel) {
+                    buy($inst, $configs, $ltpopt);
+                }   
+            }
+        } else {
+            buy($inst, $configs, $ltpopt);
+        }
     } 
 } else {
     if($openpos->opt == 'CALL' && $data == '::SHORT::') {
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
-        sell($openpos->tradingsymbol, $configs, $openpos->quantity, $ltpopt);
+        if($openslorder != null) {
+            if($ltpopt - $openslorder->parent_price > 9) {
+                $params["trigger_price"] = $ltpopt - 5; 
+                $kite->modifyOrder($openslorder->variety, $$openslorder->order_id, $params);
+            }
+        }
     } elseif ($openpos->opt == 'PUT' && $data == '::LONG::') {
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
-        sell($openpos->tradingsymbol, $configs, $openpos->quantity, $ltpopt);
+        if($openslorder != null) {
+            if($ltpopt - $openslorder->parent_price > 9) {
+                $params["trigger_price"] = $ltpopt - 5; 
+                $kite->modifyOrder($openslorder->variety, $$openslorder->order_id, $params);
+            }
+        }
     }
 }
 
@@ -62,34 +96,69 @@ function get_openposition($configs) {
 
 }
 
+function get_openorders($configs, $orders) {
+
+    foreach ($orders as $key => $pos) {
+        if ($pos->status == 'OPEN') {
+            $openpos = $pos;
+            $opt = substr($pos->tradingsymbol, -2);
+            if ($opt == 'CE') {
+                $openpos->opt = 'CALL';
+            } elseif ($opt == 'PE') {
+                $openpos->opt = 'PUT';			
+            }	
+        }
+    }
+    if(isset($openpos->opt)) {
+        return $openpos;
+    } else {
+        return null;
+    }
+
+}
+
+
+function get_pendingslorders($configs, $orders) {
+
+    foreach ($orders as $key => $pos) {
+        if ($pos->status == 'TRIGGER PENDING') {
+            $openpos = $pos;
+            $opt = substr($pos->tradingsymbol, -2);
+            if ($opt == 'CE') {
+                $openpos->opt = 'CALL';
+            } elseif ($opt == 'PE') {
+                $openpos->opt = 'PUT';			
+            }	
+        }
+    }
+
+    foreach ($allpos as $key => $pos) {
+        if ($openpos->parent_order_id == $pos->order_id) {
+            $openpos->parent_price = $pos->price;
+        }
+    }
+    if(isset($openpos->opt)) {
+        return $openpos;
+    } else {
+        return null;
+    }
+
+}
+
+
+
 function buy($inst, $configs, $ltp) {
     $kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
 
-	$order_id = $kite->placeOrder("regular", [
+	$order_id = $kite->placeOrder("co", [
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
 		"quantity" => 100,
-        "price" => $ltp - 5,
+        "price" => $ltp - 2,
+        "trigger_price" => round($ltp/100),
 		"transaction_type" => "BUY",
 		"order_type" => "LIMIT",
-		"product" => "NRML"
-	])["order_id"];
-
-    return $order_id;
-}
-
-function sl($inst, $configs, $ltp) {
-    $kite = new KiteConnect($configs["api_key"]);
-	$kite->setAccessToken($configs["access_token"]);
-
-	$order_id = $kite->placeOrder("regular", [
-		"tradingsymbol" => $inst,
-		"exchange" => "NFO",
-		"quantity" => 100,
-        "price" => $ltp - 10,
-		"transaction_type" => "SELL",
-		"order_type" => "SL-M",
 		"product" => "NRML"
 	])["order_id"];
 
@@ -99,14 +168,14 @@ function sl($inst, $configs, $ltp) {
 function sell($inst, $configs, $quantity, $ltp) {
 	$kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
-
+    $kite->modifyOrder($variety, $order_id, $params);
 	$order_id = $kite->placeOrder("regular", [
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
-        "price" => $ltp + 5,
+        "trigger_price" => $ltp + 5,
 		"quantity" => $quantity,
 		"transaction_type" => "SELL",
-		"order_type" => "LIMIT",
+		"order_type" => "SL-M",
 		"product" => "NRML"
 	])["order_id"];
 }
