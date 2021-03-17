@@ -57,7 +57,7 @@ if($openpos == null) {
         if($openslorder != null) {
             if($ltpopt - $openslorder->parent_price > 9) {
                 $params["trigger_price"] = $ltpopt - 5; 
-                $kite->modifyOrder($openslorder->variety, $$openslorder->order_id, $params);
+                $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
             }
         }
     } elseif ($openpos->opt == 'PUT' && $data == '::LONG::') {
@@ -65,7 +65,7 @@ if($openpos == null) {
         if($openslorder != null) {
             if($ltpopt - $openslorder->parent_price > 9) {
                 $params["trigger_price"] = $ltpopt - 5; 
-                $kite->modifyOrder($openslorder->variety, $$openslorder->order_id, $params);
+                $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
             }
         }
     }
