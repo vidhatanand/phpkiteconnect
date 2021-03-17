@@ -41,7 +41,7 @@ if($openpos == null) {
         error_log('buy '. $inst, $ltpopt);
         if($openord != null) {
             $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
-            if($ltpopenord - $openord->tradingsymbol > 9 ) {
+            if($ltpopenord - $openord->price > 9 ) {
                 $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
                 if($cancel) {
                     buy($inst, $configs, $ltpopt);
