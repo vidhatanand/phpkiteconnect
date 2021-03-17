@@ -7,7 +7,7 @@ if ($data == '::LONG::') {
     $configs[$currentTimeinSeconds] = '1';
     error_log("111111");
 
-} elseif ($data == '::LONG::') {
+} elseif ($data == '::SHORT::') {
     $configs[$currentTimeinSeconds] = '-1';
     error_log("-----111111");
 
