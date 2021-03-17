@@ -5,9 +5,12 @@ $currentTimeinSeconds = time();
 
 if ($data == '::LONG::') {
     $configs[$currentTimeinSeconds] = '1';
+    error_log("111111");
 
 } elseif ($data == '::LONG::') {
     $configs[$currentTimeinSeconds] = '-1';
+    error_log("-----111111");
+
 }
 
 $configs_object = json_encode($configs);
