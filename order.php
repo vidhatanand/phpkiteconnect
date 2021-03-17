@@ -132,7 +132,7 @@ function get_pendingslorders($configs, $orders) {
         }
     }
 
-    foreach ($allpos as $key => $pos) {
+    foreach ($orders as $key => $pos) {
         if ($openpos->parent_order_id == $pos->order_id) {
             $openpos->parent_price = $pos->price;
         }
