@@ -8,17 +8,26 @@ $configs = json_decode($configs_object, true);
 
 $openpos = get_openposition($configs);
 
-if ($data == '::LONG::' && $openpos == null) {
-    $ltp = get_ltp($configs);
-    $inst = build_nearest_atm($ltp, 'CALL');
-    buy($inst, $configs);
+if($openpos == null) {
+    if ($data == '::LONG::') {
+        $ltp = get_ltp($configs);
+        $inst = build_nearest_atm($ltp, 'CALL');
+        buy($inst, $configs);
+    
+    
+    } elseif ($data == '::SHORT::') {
+        $ltp = get_ltp($configs);
+        $inst = build_nearest_atm($ltp, 'PUT');
+        buy($inst, $configs);
+    } 
+} else {
+    if($openpos->opt == 'CALL' && $data == '::SHORT::') {
 
+    } elseif ($openpos->opt == 'PUT' && $data == '::LONG::') {
 
-} elseif ($data == '::SHORT::' && $openpos == null) {
-    $ltp = get_ltp($configs);
-    $inst = build_nearest_atm($ltp, 'PUT');
-    buy($inst, $configs);
+    }
 }
+
 
 function get_openposition($configs) {
     $kite = new KiteConnect($configs["api_key"]);
