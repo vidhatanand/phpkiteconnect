@@ -9,26 +9,31 @@ $configs = json_decode($configs_object, true);
 $openpos = get_openposition($configs);
 
 if($openpos == null) {
-
     error_log('no order');
     if ($data == '::LONG::') {
-        $ltp = get_ltp($configs);
+        $ltp = get_ltp($configs, "260105");
         $inst = build_nearest_atm($ltp, 'CALL');
-        error_log('buy '. $inst);
-        buy($inst, $configs);
-    
+        $ltpopt = get_ltp($configs, "NFO:".$inst);
+        error_log('buy '. $inst );
+        buy($inst, $configs, $ltpopt);
+        sl($inst, $configs, $ltpopt);
+        
     
     } elseif ($data == '::SHORT::') {
-        $ltp = get_ltp($configs);
+        $ltp = get_ltp($configs, "260105");
         $inst = build_nearest_atm($ltp, 'PUT');
-        error_log('buy '. $inst);
-        buy($inst, $configs);
+        $ltpopt = get_ltp($configs, "NFO:".$inst);
+        error_log('buy '. $inst, $ltpopt);
+        buy($inst, $configs, $ltpopt);
+        sl($inst, $configs, $ltpopt);
     } 
 } else {
     if($openpos->opt == 'CALL' && $data == '::SHORT::') {
-        sell($openpos->tradingsymbol, $configs, $openpos->quantity);
+        $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
+        sell($openpos->tradingsymbol, $configs, $openpos->quantity, $ltpopt);
     } elseif ($openpos->opt == 'PUT' && $data == '::LONG::') {
-        sell($openpos->tradingsymbol, $configs, $openpos->quantity);
+        $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
+        sell($openpos->tradingsymbol, $configs, $openpos->quantity, $ltpopt);
     }
 }
 
@@ -46,8 +51,7 @@ function get_openposition($configs) {
 				$openpos->opt = 'CALL';
 			} elseif ($opt == 'PE') {
 				$openpos->opt = 'PUT';			
-			}
-		
+			}	
 		}
 	}
     if(isset($openpos->opt)) {
@@ -58,7 +62,7 @@ function get_openposition($configs) {
 
 }
 
-function buy($inst, $configs) {
+function buy($inst, $configs, $ltp) {
     $kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
 
@@ -66,32 +70,51 @@ function buy($inst, $configs) {
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
 		"quantity" => 100,
+        "price" => $ltp - 5,
 		"transaction_type" => "BUY",
-		"order_type" => "MARKET",
+		"order_type" => "LIMIT",
 		"product" => "NRML"
 	])["order_id"];
 
     return $order_id;
 }
 
-function sell($inst, $configs, $quantity) {
+function sl($inst, $configs, $ltp) {
+    $kite = new KiteConnect($configs["api_key"]);
+	$kite->setAccessToken($configs["access_token"]);
+
+	$order_id = $kite->placeOrder("regular", [
+		"tradingsymbol" => $inst,
+		"exchange" => "NFO",
+		"quantity" => 100,
+        "price" => $ltp - 10,
+		"transaction_type" => "SELL",
+		"order_type" => "SL-M",
+		"product" => "NRML"
+	])["order_id"];
+
+    return $order_id;
+}
+
+function sell($inst, $configs, $quantity, $ltp) {
 	$kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
 
 	$order_id = $kite->placeOrder("regular", [
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
+        "price" => $ltp + 5,
 		"quantity" => $quantity,
 		"transaction_type" => "SELL",
-		"order_type" => "MARKET",
+		"order_type" => "LIMIT",
 		"product" => "NRML"
 	])["order_id"];
 }
 
-function get_ltp($configs) {
+function get_ltp($configs, $symbols) {
     $kite = new KiteConnect($configs["api_key"]);
     $kite->setAccessToken($configs["access_token"]);
-    $values = $kite->getLTP(["260105"]);
+    $values = $kite->getLTP([$symbols]);
 
     foreach ($values as $key => $value) {
         $price = $value->last_price;
