@@ -63,12 +63,16 @@ if($openpos == null) {
         // Trail
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
         if($openslorder != null) {
-            if($ltpopt - $openslorder->trigger_price > 10) {
-                $params["trigger_price"] = $ltpopt - 5; 
+            
+            if($ltpopt - $openslorder->parent_price > 3) {
+                $params["trigger_price"] = $ltpopt - 2;
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
+            }elseif($ltpopt - $openslorder->trigger_price > 10) {
+                $params["trigger_price"] = $ltpopt - 5; 
+                $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);             
             }
+        
         } 
-
     }
 }
 
