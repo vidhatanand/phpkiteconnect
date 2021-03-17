@@ -24,7 +24,7 @@ if($openpos == null) {
         error_log('buy '. $inst );
         if($openord != null) {
             $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
-            if($ltpopenord - $openord->tradingsymbol > 9 ) {
+            if($ltpopenord - $openord->price > 8 ) {
                 $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
                 if($cancel) {
                     buy($inst, $configs, $ltpopt);
@@ -41,7 +41,7 @@ if($openpos == null) {
         error_log('buy '. $inst, $ltpopt);
         if($openord != null) {
             $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
-            if($ltpopenord - $openord->price > 9 ) {
+            if($ltpopenord - $openord->price > 8 ) {
                 $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
                 if($cancel) {
                     buy($inst, $configs, $ltpopt);
@@ -55,7 +55,7 @@ if($openpos == null) {
     if($openpos->opt == 'CALL' && $data == '::SHORT::') {
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
         if($openslorder != null) {
-            if($ltpopt - $openslorder->parent_price > 9) {
+            if($ltpopt - $openslorder->parent_price > 8) {
                 $params["trigger_price"] = $ltpopt - 5; 
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
             }
@@ -63,7 +63,7 @@ if($openpos == null) {
     } elseif ($openpos->opt == 'PUT' && $data == '::LONG::') {
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
         if($openslorder != null) {
-            if($ltpopt - $openslorder->parent_price > 9) {
+            if($ltpopt - $openslorder->parent_price > 8) {
                 $params["trigger_price"] = $ltpopt - 5; 
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
             }
