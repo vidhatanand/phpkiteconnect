@@ -50,7 +50,7 @@ function get_openposition($configs) {
 		
 		}
 	}
-    if(count($openpos) != 0) {
+    if(isset($openpos->opt)) {
         return $openpos;
     } else {
         return null;
