@@ -102,7 +102,7 @@ if($openpos == null) {
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
         if($openslorder != null) {
             
-            if($ltpopt - $openslorder->parent_price > 3) {
+            if($ltpopt - $openslorder->parent_price > 4) {
                 $params["trigger_price"] = $openslorder->parent_price + 2;
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
             } elseif($ltpopt - $openslorder->trigger_price > 10) {
