@@ -69,7 +69,7 @@ if($openpos == null) {
                 $params["trigger_price"] = $openslorder->parent_price + 2;
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
             } elseif($ltpopt - $openslorder->trigger_price > 10) {
-                $params["trigger_price"] = $openslorder->parent_price + 5;
+                $params["trigger_price"] = $openslorder->trigger_price + 5;
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);             
             }
         
@@ -160,7 +160,7 @@ function buy($inst, $configs, $ltp) {
 	$order_id = $kite->placeOrder("co", [
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
-		"quantity" => 25,
+		"quantity" => 1000,
         //"price" => $ltp,
         "trigger_price" => $ltp - round($ltp/50),
 		"transaction_type" => "BUY",
