@@ -24,7 +24,7 @@ if($openpos == null) {
         error_log('buy '. $inst );
         if($openord != null) {
             $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
-            if($ltpopenord - $openord->price > 8 ) {
+            if($ltpopenord - $openord->price > 5 ) {
                 $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
                 if($cancel) {
                     buy($inst, $configs, $ltpopt);
@@ -41,7 +41,7 @@ if($openpos == null) {
         error_log('buy '. $inst, $ltpopt);
         if($openord != null) {
             $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
-            if($ltpopenord - $openord->price > 8 ) {
+            if($ltpopenord - $openord->price > 5 ) {
                 $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
                 if($cancel) {
                     buy($inst, $configs, $ltpopt);
@@ -56,7 +56,7 @@ if($openpos == null) {
         // bhago
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
         if($openslorder != null) {
-            $params["trigger_price"] = $ltpopt - 1; 
+            $params["trigger_price"] = $ltpopt - 2; 
             $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
         } 
     } elseif (($openpos->opt == 'CALL' && $data == '::LONG::') or ($openpos->opt == 'PUT' && $data == '::SHORT::')) {
@@ -65,10 +65,9 @@ if($openpos == null) {
         if($openslorder != null) {
             
             if($ltpopt - $openslorder->parent_price > 3) {
-                $params["trigger_price"] = $ltpopt - 2;
+                $params["trigger_price"] = $openslorder->parent_price + 2;
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
-            }elseif($ltpopt - $openslorder->trigger_price > 10) {
-                $params["trigger_price"] = $ltpopt - 5; 
+            } elseif($ltpopt - $openslorder->trigger_price > 10) {
                 $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);             
             }
         
@@ -160,10 +159,10 @@ function buy($inst, $configs, $ltp) {
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
 		"quantity" => 1000,
-        "price" => $ltp,
-        "trigger_price" => $ltp - round($ltp/20),
+        //"price" => $ltp,
+        "trigger_price" => $ltp - round($ltp/50),
 		"transaction_type" => "BUY",
-		"order_type" => "LIMIT",
+		"order_type" => "MARKET",
 		"product" => "NRML"
 	])["order_id"];
 
