@@ -17,7 +17,7 @@ $openslorder = get_pendingslorders($configs, $allpos);
 
 if($openpos == null) {
     error_log('no order');
-    if ($data == '::LONG::') {
+    if ($data == 'buy') {
         $ltp = get_ltp($configs, "260105");
         $inst = build_nearest_atm($ltp, 'CALL');
         $ltpopt = get_ltp($configs, "NFO:".$inst);
@@ -34,7 +34,7 @@ if($openpos == null) {
             buy($inst, $configs, $ltpopt);
         }
 
-    } elseif ($data == '::SHORT::') {
+    } elseif ($data == 'sell') {
         $ltp = get_ltp($configs, "260105");
         $inst = build_nearest_atm($ltp, 'PUT');
         $ltpopt = get_ltp($configs, "NFO:".$inst);
@@ -52,14 +52,14 @@ if($openpos == null) {
         }
     } 
 } else {
-    if(($openpos->opt == 'CALL' && $data == '::SHORT::') or ($openpos->opt == 'PUT' && $data == '::LONG::')) {
+    if(($openpos->opt == 'CALL' && $data == 'sell') or ($openpos->opt == 'PUT' && $data == 'buy')) {
         // bhago
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
         if($openslorder != null) {
             $params["trigger_price"] = $ltpopt - 2; 
             $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
         } 
-    } elseif (($openpos->opt == 'CALL' && $data == '::LONG::') or ($openpos->opt == 'PUT' && $data == '::SHORT::')) {
+    } elseif (($openpos->opt == 'CALL' && $data == 'buy') or ($openpos->opt == 'PUT' && $data == 'sell')) {
         // Trail
         $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
         if($openslorder != null) {
