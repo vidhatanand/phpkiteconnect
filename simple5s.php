@@ -58,44 +58,6 @@ if($openpos == null) {
         if($openslorder != null) {
             $params["trigger_price"] = $ltpopt-1; 
             $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
-
-            if ($data == 'buy') {
-                $ltp = get_ltp($configs, "260105");
-                $inst = build_nearest_atm($ltp, 'CALL');
-                $ltpopt = get_ltp($configs, "NFO:".$inst);
-                error_log('buy '. $inst );
-                if($openord != null) {
-                    $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
-                    if($ltpopenord - $openord->price > 5 ) {
-                        $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
-                        if($cancel) {
-                            buy($inst, $configs, $ltpopt);
-                        }   
-                    }
-                } else {
-                    buy($inst, $configs, $ltpopt);
-                }
-        
-            } elseif ($data == 'sell') {
-                $ltp = get_ltp($configs, "260105");
-                $inst = build_nearest_atm($ltp, 'PUT');
-                $ltpopt = get_ltp($configs, "NFO:".$inst);
-                error_log('buy '. $inst, $ltpopt);
-                if($openord != null) {
-                    $ltpopenord = get_ltp($configs, "NFO:".$openord->tradingsymbol);
-                    if($ltpopenord - $openord->price > 5 ) {
-                        $cancel = $kite->cancelOrder($openord->variety, $openord->order_id);
-                        if($cancel) {
-                            buy($inst, $configs, $ltpopt);
-                        }   
-                    }
-                } else {
-                    buy($inst, $configs, $ltpopt);
-                }
-            } 
-
-
-
         } 
     } elseif (($openpos->opt == 'CALL' && $data == 'buy') or ($openpos->opt == 'PUT' && $data == 'sell')) {
         // Trail
