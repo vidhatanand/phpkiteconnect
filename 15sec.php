@@ -38,7 +38,7 @@ if($openpos == null) {
         if($openslorder != null) {
             $params["trigger_price"] = $ltpopt - 1; 
             //$kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
-            $kite->exitOrder($openslorder->variety, $openslorder->order_id);
+            sell($openpos->tradingsymbol, $configs, $openpos->quantity);
         }
         if ($data == 'buy') {
         
@@ -151,19 +151,18 @@ function buy($inst, $configs, $ltp) {
     return $order_id;
 }
 
-function sell($inst, $configs, $quantity, $ltp) {
-	$kite = new KiteConnect($configs["api_key"]);
-	$kite->setAccessToken($configs["access_token"]);
-    $kite->modifyOrder($variety, $order_id, $params);
-	$order_id = $kite->placeOrder("regular", [
-		"tradingsymbol" => $inst,
-		"exchange" => "NFO",
-        "trigger_price" => $ltp + 5,
-		"quantity" => $quantity,
-		"transaction_type" => "SELL",
-		"order_type" => "SL-M",
-		"product" => "NRML"
-	])["order_id"];
+function sell($inst, $configs, $quantity) {
+    $kite = new KiteConnect($configs["api_key"]);
+    $kite->setAccessToken($configs["access_token"]);
+    $order_id = $kite->placeOrder("regular", [
+        "tradingsymbol" => $inst,
+        "exchange" => "NFO",
+        //"trigger_price" => $ltp + 5,
+        "quantity" => $quantity,
+        "transaction_type" => "SELL",
+        "order_type" => "MARKET",
+        "product" => "NRML"
+    ])["order_id"];
 }
 
 function get_ltp($configs, $symbols) {

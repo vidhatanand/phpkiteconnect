@@ -4,19 +4,44 @@
     $configs = json_decode($configs_object, true);
 
 
-	$op = build_nearest_atm(34600, 'PUT');
+	// $myfile = fopen("newfile.txt", "w") or die("Unable to open file!");
+	// $txt = print_r($allpos, true);
+	// fwrite($myfile, $txt);
+	// fclose($myfile);
 
-	echo $op;
-	function build_nearest_atm($price, $opt) {
-		$rprice = round($price);
-		$pstrike = $rprice - ($rprice % 500);
-		$cstrike = $rprice - ($rprice % 500) + 500;
-		$expiry = '21MAR';
+	$openpos = get_openposition($configs);
+	print_r($openpos); 
+	echo $openpos->tradingsymbol;
+
 	
-		if ($opt == 'CALL') {
-			return 'BANKNIFTY'.$expiry.$cstrike.'CE';
-		} elseif($opt == 'PUT') {
-			return 'BANKNIFTY'.$expiry.$pstrike.'PE';
+
+	
+
+	function get_openposition($configs) {
+		$kite = new KiteConnect($configs["api_key"]);
+		$kite->setAccessToken($configs["access_token"]);
+	
+		$allpos = $kite->getPositions();
+		foreach ($allpos->net as $key => $pos) {
+			if ($pos->quantity != 0) {
+				$openpos = $pos;
+				$opt = substr($pos->tradingsymbol, -2);
+				if ($opt == 'CE') {
+					$openpos->opt = 'CALL';
+				} elseif ($opt == 'PE') {
+					$openpos->opt = 'PUT';			
+				}	
+			}
 		}
+		if(isset($openpos->opt)) {
+			return $openpos;
+		} else {
+			return null;
+		}
+	
 	}
+
+
+
+
 ?>
