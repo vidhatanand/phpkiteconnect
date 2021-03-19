@@ -136,7 +136,7 @@ function buy($inst, $configs, $ltp) {
 	$order_id = $kite->placeOrder("regular", [
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
-		"quantity" => 500,
+		"quantity" => 25,
         //"price" => $ltp,
         //"trigger_price" => $ltp - round($ltp/50),
 		"transaction_type" => "BUY",
