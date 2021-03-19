@@ -34,12 +34,8 @@ if($openpos == null) {
 } else {
     if(($openpos->opt == 'CALL' && $data == 'sell') or ($openpos->opt == 'PUT' && $data == 'buy')) {
         // bhago
-        $ltpopt = get_ltp($configs, "NFO:".$openpos->tradingsymbol);
-        if($openslorder != null) {
-            $params["trigger_price"] = $ltpopt - 1; 
             //$kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
             sell($openpos->tradingsymbol, $configs, $openpos->quantity);
-        }
         if ($data == 'buy') {
         
             $inst = build_nearest_atm($ltp, 'CALL');
