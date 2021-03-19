@@ -38,7 +38,7 @@ if($openpos == null) {
         if($openslorder != null) {
             $params["trigger_price"] = $ltpopt - 1; 
             //$kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
-            $kite->exitOrder($openslorder->variety, $openslorder->order_id)
+            $kite->exitOrder($openslorder->variety, $openslorder->order_id);
         }
         if ($data == 'buy') {
         
