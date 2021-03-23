@@ -15,7 +15,8 @@ set_time_limit(0);//Run infinitely
 while (true) 
 { 
   //==do your rest of works here. 
-  echo "Current timestamp is: ".time().PHP_EOL; 
+  $curr_date = date('Y-m-d H:i:s', time()).PHP_EOL;
+  echo $curr_date; 
 
   $openpos = get_openposition($configs);
 
@@ -77,7 +78,7 @@ while (true)
         echo ' - Parent_price: '.$openslorder->parent_price;
         echo ' - Trigger_price: '.$openslorder->trigger_price;
   } else {
-    echo 'NO open sl order found'.PHP_EOL; 
+    echo 'NO open SL order found'.PHP_EOL; 
   }
 
 
