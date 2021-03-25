@@ -14,9 +14,7 @@ set_time_limit(0);//Run infinitely
  
 while (true) 
 { 
-  //==do your rest of works here. 
-  $curr_date = date('Y-m-d H:i:s', time()).PHP_EOL;
-  echo $curr_date; 
+  //==do your rest of works here.
 
   $openpos = get_openposition($configs);
 
