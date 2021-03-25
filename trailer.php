@@ -33,7 +33,7 @@ while (true)
       $ltpopt = get_ltp($configs, "NFO:".$openslorder->tradingsymbol);
       
       if ($ltpopt > $openslorder->parent_price) {
-          if($ltpopt - $openslorder->parent_price > 5 && ($openslorder->parent_price > $openslorder->trigger_price) && ($openslorder->trail0 != true)) {
+          if($ltpopt - $openslorder->parent_price > 10 && ($openslorder->parent_price > $openslorder->trigger_price) && ($openslorder->trail0 != true)) {
               echo 'Trail 0 -- ';
               echo ' - LTP: '.$ltpopt;
               echo ' - Parent_price: '.$openslorder->parent_price;
@@ -43,27 +43,27 @@ while (true)
               if (isset($out->order_id)) {
                 $openslorder->trail0 = true;
               }
-          } elseif(($ltpopt - $openslorder->parent_price > 20) && ($ltpopt > $openslorder->parent_price) && ($openslorder->parent_price < $openslorder->trigger_price) && ($openslorder->trail1 != true)) {
+          } elseif(($ltpopt - $openslorder->parent_price > 30) && ($ltpopt > $openslorder->parent_price) && ($openslorder->parent_price < $openslorder->trigger_price) && ($openslorder->trail1 != true)) {
             echo 'Trail 1 -- ';
             echo ' - LTP: '.$ltpopt;
             echo ' - Parent_price: '.$openslorder->parent_price;
             echo ' - Trigger_price: '.$openslorder->trigger_price;
-              $params["trigger_price"] = ($openslorder->parent_price) + 10;
+              $params["trigger_price"] = ($openslorder->parent_price) + 20;
               $out = $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);     
               if (isset($out->order_id)) {
                 $openslorder->trail1 = true;
               }        
-          }elseif (($ltpopt - $openslorder->parent_price > 40) && ($openslorder->parent_price < $openslorder->trigger_price) && (round($openslorder->trigger_price - $openslorder->parent_price) == 10) && ($openslorder->trail2 != true)) {
+          }elseif (($ltpopt - $openslorder->parent_price > 70) && ($openslorder->parent_price < $openslorder->trigger_price) && (round($openslorder->trigger_price - $openslorder->parent_price) == 20) && ($openslorder->trail2 != true)) {
             echo 'Trail 2 -- ';
             echo ' - LTP: '.$ltpopt;
             echo ' - Parent_price: '.$openslorder->parent_price;
             echo ' - Trigger_price: '.$openslorder->trigger_price;
-              $params["trigger_price"] = $ltpopt - 10;
+              $params["trigger_price"] = $ltpopt - 15;
               $out = $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
               if (isset($out->order_id)) {
                 $openslorder->trail2 = true;
               }
-          } elseif(($ltpopt - $openslorder->trigger_price > 40) and ($openslorder->trigger_price - $openslorder->parent_price) > 10) {
+          } elseif(($ltpopt - $openslorder->trigger_price > 100) and ($openslorder->trigger_price - $openslorder->parent_price) > 20) {
             echo 'Trail 3 -- ';
             echo ' - LTP: '.$ltpopt;
             echo ' - Parent_price: '.$openslorder->parent_price;
