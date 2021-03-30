@@ -66,7 +66,7 @@ while (true)
             echo ' - LTP: '.$ltpopt;
             echo ' - Parent_price: '.$openslorder->parent_price;
             echo ' - Trigger_price: '.$openslorder->trigger_price;
-              $params["trigger_price"] = $ltpopt - 10;
+              $params["trigger_price"] = $ltpopt - 20;
               $out = $kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
           }
         print_r($out->order_id);
@@ -75,8 +75,10 @@ while (true)
         echo ' - LTP: '.$ltpopt;
         echo ' - Parent_price: '.$openslorder->parent_price;
         echo ' - Trigger_price: '.$openslorder->trigger_price;
-  } else {
-    echo 'NO open SL order found'.PHP_EOL; 
+  } elseif($openslorder == null && $openpos != null) {
+    echo 'Position without SL found'.PHP_EOL; 
+    print_r($openpos); die;
+
   }
 
 

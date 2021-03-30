@@ -31,26 +31,6 @@ if($openpos == null) {
         error_log('buy '. $inst, $ltpopt);
         buy($inst, $configs, $ltpopt);
     } 
-} else {
-    if(($openpos->opt == 'CALL' && $data == 'sell') or ($openpos->opt == 'PUT' && $data == 'buy')) {
-        // bhago
-            //$kite->modifyOrder($openslorder->variety, $openslorder->order_id, $params);
-            sell($openpos->tradingsymbol, $configs, $openpos->quantity);
-        if ($data == 'buy') {
-        
-            $inst = build_nearest_atm($ltp, 'CALL');
-            $ltpopt = get_ltp($configs, "NFO:".$inst);
-            buy($inst, $configs, $ltpopt);
-    
-        } elseif ($data == 'sell') {
-            
-            $inst = build_nearest_atm($ltp, 'PUT');
-            $ltpopt = get_ltp($configs, "NFO:".$inst);
-            error_log('buy '. $inst, $ltpopt);
-            buy($inst, $configs, $ltpopt);
-        } 
-
-    }
 }
 
 
