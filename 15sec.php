@@ -117,7 +117,7 @@ function buy($inst, $configs, $ltp) {
     $kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
 
-	$order_id = $kite->placeOrder("regular", [
+	$order_id = $kite->placeOrder("co", [
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
 		"quantity" => 100,
@@ -134,7 +134,7 @@ function buy($inst, $configs, $ltp) {
 function sell($inst, $configs, $quantity) {
     $kite = new KiteConnect($configs["api_key"]);
     $kite->setAccessToken($configs["access_token"]);
-    $order_id = $kite->placeOrder("regular", [
+    $order_id = $kite->placeOrder("co", [
         "tradingsymbol" => $inst,
         "exchange" => "NFO",
         //"trigger_price" => $ltp + 5,
