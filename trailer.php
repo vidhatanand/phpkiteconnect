@@ -165,38 +165,6 @@ function get_pendingslorders($configs, $orders) {
 
 }
 
-function buy($inst, $configs, $ltp) {
-    $kite = new KiteConnect($configs["api_key"]);
-	$kite->setAccessToken($configs["access_token"]);
-
-	$order_id = $kite->placeOrder("regular", [
-		"tradingsymbol" => $inst,
-		"exchange" => "NFO",
-		"quantity" => 500,
-        //"price" => $ltp,
-        //"trigger_price" => $ltp - round($ltp/50),
-		"transaction_type" => "BUY",
-		"order_type" => "MARKET",
-		"product" => "NRML"
-	])["order_id"];
-
-    return $order_id;
-}
-
-function sell($inst, $configs, $quantity) {
-    $kite = new KiteConnect($configs["api_key"]);
-    $kite->setAccessToken($configs["access_token"]);
-    $order_id = $kite->placeOrder("regular", [
-        "tradingsymbol" => $inst,
-        "exchange" => "NFO",
-        //"trigger_price" => $ltp + 5,
-        "quantity" => $quantity,
-        "transaction_type" => "SELL",
-        "order_type" => "MARKET",
-        "product" => "NRML"
-    ])["order_id"];
-}
-
 function get_ltp($configs, $symbols) {
     $kite = new KiteConnect($configs["api_key"]);
     $kite->setAccessToken($configs["access_token"]);

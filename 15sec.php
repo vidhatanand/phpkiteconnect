@@ -113,12 +113,12 @@ function buy($inst, $configs, $ltp) {
     $kite = new KiteConnect($configs["api_key"]);
 	$kite->setAccessToken($configs["access_token"]);
 
-	$order_id = $kite->placeOrder("regular", [
+	$order_id = $kite->placeOrder("co", [
 		"tradingsymbol" => $inst,
 		"exchange" => "NFO",
-		"quantity" => 500,
+		"quantity" => 100,
         //"price" => $ltp,
-        //"trigger_price" => $ltp - round($ltp/50),
+        "trigger_price" => $ltp - 20,
 		"transaction_type" => "BUY",
 		"order_type" => "MARKET",
 		"product" => "NRML"
