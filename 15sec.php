@@ -121,7 +121,7 @@ function buy($inst, $configs, $ltp) {
         "trigger_price" => $ltp - 20,
 		"transaction_type" => "BUY",
 		"order_type" => "MARKET",
-		"product" => "NRML"
+		"product" => "MIS"
 	])["order_id"];
 
     return $order_id;
