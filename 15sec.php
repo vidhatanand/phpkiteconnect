@@ -82,6 +82,7 @@ function get_openorders($configs, $orders) {
 
 function get_pendingslorders($configs, $orders) {
 
+    $openpos = array();
     foreach ($orders as $key => $pos) {
         if ($pos->status == 'TRIGGER PENDING') {
             $openpos = $pos;
@@ -93,12 +94,15 @@ function get_pendingslorders($configs, $orders) {
             }	
         }
     }
-
-    foreach ($orders as $key => $pos) {
-        if ($openpos->parent_order_id == $pos->order_id) {
-            $openpos->parent_price = $pos->price;
-        }
+    
+    if ($openpos != null){
+        foreach ($orders as $key => $poss) {
+            if ($openpos->parent_order_id == $poss->order_id) {
+                $openpos->parent_price = $poss->average_price;
+            }
+        }   
     }
+
     if(isset($openpos->opt)) {
         return $openpos;
     } else {
