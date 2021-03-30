@@ -8,8 +8,6 @@ include dirname(__FILE__)."/kiteconnect.php";
 $configs_object = file_get_contents('./config.json');
 $configs = json_decode($configs_object, true);
 
-
-
 set_time_limit(0);//Run infinitely 
  
 while (true) 
